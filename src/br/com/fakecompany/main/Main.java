@@ -3,6 +3,7 @@ package br.com.fakecompany.main;
 import br.com.fakecompany.models.Endereco;
 import br.com.fakecompany.models.EnderecoApi;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,18 +22,24 @@ public class Main {
 
         String url = "https://viacep.com.br/ws/" + cep + "/json/";
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-        HttpResponse<String> response = client
-                .send(request, HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .build();
+            HttpResponse<String> response = client
+                    .send(request, HttpResponse.BodyHandlers.ofString());
 
-        String json = response.body();
+            String json = response.body();
 
-        EnderecoApi enderecoApi = gson.fromJson(json, EnderecoApi.class);
+            EnderecoApi enderecoApi = gson.fromJson(json, EnderecoApi.class);
 
-        Endereco endereco = new Endereco(enderecoApi);
-        System.out.println(endereco);
+            Endereco endereco = new Endereco(enderecoApi);
+            System.out.println(endereco);
+        } catch (JsonSyntaxException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("\nPrograma Finalizado!");
+        }
     }
 }
