@@ -1,6 +1,6 @@
 package br.com.fakecompany.models;
 
-public class Endereco {
+public class Address {
     private String cep;
     private String rua;
     private String complemento;
@@ -8,13 +8,13 @@ public class Endereco {
     private String cidade;
     private String uf;
 
-    public Endereco(EnderecoApi enderecoApi) {
-        this.cep = enderecoApi.cep();
-        this.rua = enderecoApi.logradouro();
-        this.complemento = enderecoApi.complemento();
-        this.bairro = enderecoApi.bairro();
-        this.cidade = enderecoApi.localidade();
-        this.uf = enderecoApi.uf();
+    public Address(ApiAddress apiAddress) {
+        this.cep = apiAddress.cep();
+        this.rua = apiAddress.logradouro();
+        this.complemento = apiAddress.complemento();
+        this.bairro = apiAddress.bairro();
+        this.cidade = apiAddress.localidade();
+        this.uf = apiAddress.uf();
     }
 
     @Override

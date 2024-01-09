@@ -1,13 +1,14 @@
 package br.com.fakecompany.main;
 
-import br.com.fakecompany.models.Endereco;
-import br.com.fakecompany.models.EnderecoApi;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import br.com.fakecompany.models.*;
+import com.google.gson.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -15,31 +16,51 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().
+                setPrettyPrinting().
+                create();
 
-        System.out.println("Digite seu CEP: ");
-        int cep = scanner.nextInt();
+        List<Address> addresses = new LinkedList<>();
 
-        String url = "https://viacep.com.br/ws/" + cep + "/json/";
+        while (true) {
 
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .build();
-            HttpResponse<String> response = client
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Digite seu CEP: ");
+            String cep = scanner.nextLine();
 
-            String json = response.body();
+            if (cep.equalsIgnoreCase("sair")) {
+                break;
+            }
 
-            EnderecoApi enderecoApi = gson.fromJson(json, EnderecoApi.class);
+            String url = "https://viacep.com.br/ws/" + cep.replace(" ", "") + "/json/";
 
-            Endereco endereco = new Endereco(enderecoApi);
-            System.out.println(endereco);
-        } catch (JsonSyntaxException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            System.out.println("\nPrograma Finalizado!");
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .build();
+                HttpResponse<String> response = client
+                        .send(request, HttpResponse.BodyHandlers.ofString());
+
+                String json = response.body();
+
+                ApiAddress apiAddress = gson.fromJson(json, ApiAddress.class);
+
+                Address address = new Address(apiAddress);
+                System.out.println(address);
+
+                addresses.add(address);
+
+            } catch (JsonSyntaxException | IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println("\nDigite sair para encerrar a aplicação");
         }
+        System.out.println(addresses);
+
+        FileWriter writer = new FileWriter("address.json");
+        writer.write(gson.toJson(addresses));
+        writer.close();
+
+        System.out.println("\nPrograma Finalizado!");
     }
 }
