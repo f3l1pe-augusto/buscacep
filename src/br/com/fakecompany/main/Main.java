@@ -1,9 +1,8 @@
 package br.com.fakecompany.main;
 
+import br.com.fakecompany.models.Endereco;
 import br.com.fakecompany.models.EnderecoApi;
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,10 +14,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setPrettyPrinting()
-                .create();
+        Gson gson = new Gson();
 
         System.out.println("Digite seu CEP: ");
         int cep = scanner.nextInt();
@@ -33,9 +29,10 @@ public class Main {
                 .send(request, HttpResponse.BodyHandlers.ofString());
 
         String json = response.body();
-        System.out.println(json);
 
         EnderecoApi enderecoApi = gson.fromJson(json, EnderecoApi.class);
-        System.out.println(enderecoApi);
+
+        Endereco endereco = new Endereco(enderecoApi);
+        System.out.println(endereco);
     }
 }
